@@ -372,7 +372,7 @@ async function sendAI() {
 }
 
 function sendSuggestion(s) { aiInput.value = s; sendAI() }
-function handleLogout() { auth.logout(); router.push('/login') }
+function handleLogout() { auth.logout(); window.location.href = '/login' }
 onMounted(loadData)
 </script>
 
