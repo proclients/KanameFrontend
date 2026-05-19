@@ -372,7 +372,7 @@ async function sendAI() {
 }
 
 function sendSuggestion(s) { aiInput.value = s; sendAI() }
-function handleLogout() { auth.logout(); window.location.href = '/login' }
+function handleLogout() { auth.logout(); showUserMenu.value = false; window.location.replace('/login') }
 onMounted(loadData)
 </script>
 
@@ -413,8 +413,8 @@ onMounted(loadData)
 
 .warning-bar { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 10px 14px; font-size: 13px; color: var(--red); margin-bottom: 12px; font-weight: 600; }
 
-.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: stretch; margin-bottom: 16px; }
-.chart-wrap { margin-top: 10px; max-width: 200px; margin-left: auto; margin-right: auto; }
+.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: stretch; flex: 1; }
+.chart-wrap { margin-top: 10px; max-width: 240px; margin-left: auto; margin-right: auto; margin-bottom: 12px; }
 .empty-chart { text-align: center; color: var(--muted); padding: 32px 0; font-size: 13px; }
 .cat-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
 .cat-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
