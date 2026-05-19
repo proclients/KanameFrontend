@@ -279,7 +279,7 @@ const sortedTransactions = computed(() => {
   return list
 })
 
-const COLORS = ['#ff4444','#ffd700','#00e5ff','#ff6b35','#a8ff3e','#ff69b4','#00ffcc','#ff9500','#c9a96e','#ff3399']
+const COLORS = ['#c0392b','#d4ac0d','#1a7abf','#ca6f1e','#1e8449','#76448a','#148f77','#d35400','#c9a96e','#922b21']
 const chartData = computed(() => {
   const cats = Object.keys(summary.value.by_category || {})
   return {
@@ -405,8 +405,8 @@ onMounted(loadData)
 
 .warning-bar { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 10px 14px; font-size: 13px; color: var(--red); margin-bottom: 12px; font-weight: 600; }
 
-.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.chart-wrap { margin-top: 10px; max-width: 200px; margin-left: auto; margin-right: auto; }
+.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: start; margin-bottom: 16px; }
+.chart-wrap { margin-top: 10px; max-width: 180px; margin-left: auto; margin-right: auto; }
 .empty-chart { text-align: center; color: var(--muted); padding: 32px 0; font-size: 13px; }
 .cat-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
 .cat-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
