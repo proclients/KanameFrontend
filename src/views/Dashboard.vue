@@ -84,7 +84,7 @@
           <div class="form-grid">
             <input v-model="form.name" placeholder="Item name (e.g. Ramen)" />
             <input
-              v-model="displayAmount"
+              :value="displayAmount"
               type="text"
               placeholder="Amount"
               @input="onAmountInput"
@@ -279,7 +279,7 @@ const sortedTransactions = computed(() => {
   return list
 })
 
-const COLORS = ['#ef4444','#3b82f6','#8b5cf6','#f59e0b','#ec4899','#10b981','#06b6d4','#6b7280','#c9a96e','#22c55e']
+const COLORS = ['#ff4444','#ffd700','#00e5ff','#ff6b35','#a8ff3e','#ff69b4','#00ffcc','#ff9500','#c9a96e','#ff3399']
 const chartData = computed(() => {
   const cats = Object.keys(summary.value.by_category || {})
   return {
@@ -287,7 +287,7 @@ const chartData = computed(() => {
     datasets: [{ data: cats.map(c => summary.value.by_category[c]), backgroundColor: COLORS.slice(0, cats.length), borderWidth: 0 }]
   }
 })
-const chartOptions = { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: '#f0ece4', font: { family: 'Outfit' } } } } }
+const chartOptions = { responsive: true, cutout: '0%', plugins: { legend: { position: 'bottom', labels: { color: '#f0ece4', font: { family: 'Outfit', size: 11 }, padding: 12, boxWidth: 12 } }, tooltip: { callbacks: { label: (ctx) => { const total = ctx.dataset.data.reduce((a,b) => a+b, 0); const pct = Math.round((ctx.parsed/total)*100); return ' ' + ctx.label + ': ' + pct + '%'; } } } } }
 
 function prevMonth() {
   if (currentMonth.value === 1) { currentMonth.value = 12; currentYear.value-- }
