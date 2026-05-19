@@ -412,8 +412,8 @@ onMounted(loadData)
 
 .warning-bar { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 10px 14px; font-size: 13px; color: var(--red); margin-bottom: 12px; font-weight: 600; }
 
-.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: stretch; min-height: calc(100vh - 320px); }
-.chart-wrap { margin-top: 10px; max-width: 100%; margin-left: auto; margin-right: auto; margin-bottom: 8px; }
+.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: start; }
+.chart-wrap { margin-top: 16px; max-width: 100%; margin-left: auto; margin-right: auto; margin-bottom: 16px; }
 .empty-chart { text-align: center; color: var(--muted); padding: 32px 0; font-size: 13px; }
 .cat-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
 .cat-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
