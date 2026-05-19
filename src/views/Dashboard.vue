@@ -412,11 +412,13 @@ onMounted(loadData)
 
 .warning-bar { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 10px 14px; font-size: 13px; color: var(--red); margin-bottom: 12px; font-weight: 600; }
 
-.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: stretch; }
-.chart-wrap { padding: 16px 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: start; margin-bottom: 16px; }
+.chart-wrap { width: 100%; padding: 12px 4px 8px; }
 .empty-chart { text-align: center; color: var(--muted); padding: 32px 0; font-size: 13px; }
 .cat-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
-.cat-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 12px; gap: 4px; } .cat-name { color: var(--muted); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .cat-amt { font-weight: 600; font-size: 11px; white-space: nowrap; }
+.cat-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.cat-name { color: var(--muted); font-size: 11px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cat-amt { font-weight: 600; font-size: 11px; white-space: nowrap; margin-left: 4px; }
 .cat-right { display: flex; align-items: center; gap: 8px; }
 .cat-pct { font-size: 11px; color: var(--accent); background: rgba(201,169,110,0.1); padding: 2px 6px; border-radius: 10px; }
 
