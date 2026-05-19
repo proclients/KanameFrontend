@@ -1,55 +1,33 @@
 <template>
   <div class="app">
-    <!-- Sidebar -->
-    <aside class="sidebar" :class="{ open: sidebarOpen }">
-      <div class="sidebar-logo">
-        <span>Kaname</span><span class="kanji">要</span>
-      </div>
-      <nav class="sidebar-nav">
-        <button :class="{ active: tab === 'dashboard' }" @click="tab = 'dashboard'; sidebarOpen = false">
-          📊 Dashboard
-        </button>
-        <button :class="{ active: tab === 'transactions' }" @click="tab = 'transactions'; sidebarOpen = false">
-          💴 Transactions
-        </button>
-        <button :class="{ active: tab === 'ai' }" @click="tab = 'ai'; sidebarOpen = false">
-          🤖 AI Assistant
-        </button>
-      </nav>
-      <div class="sidebar-user">
-        <div class="user-info">
-          <div class="avatar">{{ auth.user?.name?.[0] }}</div>
-          <div>
-            <div class="user-name">{{ auth.user?.name }}</div>
-            <div class="user-email">{{ auth.user?.email }}</div>
-          </div>
-        </div>
-        <button class="btn-ghost logout" @click="handleLogout">Logout</button>
-      </div>
-    </aside>
-
-    <!-- Overlay -->
-    <div class="overlay" v-if="sidebarOpen" @click="sidebarOpen = false"></div>
-
     <!-- Main -->
     <main class="main">
       <!-- Topbar -->
       <div class="topbar">
-        <button class="hamburger" @click="sidebarOpen = !sidebarOpen">☰</button>
+        <div class="topbar-logo">
+          <span>Kaname</span><span class="kanji">要</span>
+        </div>
         <div class="month-nav">
           <button class="btn-ghost sm" @click="prevMonth">‹</button>
           <span>{{ monthName }} {{ currentYear }}</span>
           <button class="btn-ghost sm" @click="nextMonth">›</button>
         </div>
-        <div class="currency-switch">
-          <button :class="{ active: currency === 'IDR' }" @click="currency = 'IDR'">IDR</button>
-          <button :class="{ active: currency === 'JPY' }" @click="currency = 'JPY'">JPY</button>
+        <div class="topbar-right">
+          <div class="currency-switch">
+            <button :class="{ active: currency === 'IDR' }" @click="currency = 'IDR'">IDR</button>
+            <button :class="{ active: currency === 'JPY' }" @click="currency = 'JPY'">JPY</button>
+          </div>
+          <div class="avatar" @click="showUserMenu = !showUserMenu">{{ auth.user?.name?.[0] }}</div>
+          <div class="user-menu" v-if="showUserMenu">
+            <div class="um-name">{{ auth.user?.name }}</div>
+            <div class="um-email">{{ auth.user?.email }}</div>
+            <button class="um-logout" @click="handleLogout">Logout</button>
+          </div>
         </div>
       </div>
 
       <!-- DASHBOARD TAB -->
       <div v-if="tab === 'dashboard'" class="tab-content fade-up">
-        <!-- Summary Cards -->
         <div class="summary-grid">
           <div class="card summary-card">
             <div class="s-label">Monthly Salary</div>
@@ -62,9 +40,7 @@
           </div>
           <div class="card summary-card">
             <div class="s-label">Balance</div>
-            <div class="s-value" :class="summary.balance >= 0 ? 'green' : 'red'">
-              {{ fmt(summary.balance) }}
-            </div>
+            <div class="s-value" :class="summary.balance >= 0 ? 'green' : 'red'">{{ fmt(summary.balance) }}</div>
           </div>
           <div class="card summary-card">
             <div class="s-label">Transactions</div>
@@ -72,7 +48,11 @@
           </div>
         </div>
 
-        <!-- Chart + Categories -->
+        <!-- Warning bar -->
+        <div class="warning-bar" v-if="summary.salary > 0 && (summary.salary - summary.total_expense) <= 200000">
+          ⚠️ Pengeluaran sudah {{ Math.round((summary.total_expense / summary.salary) * 100) }}% dari gaji!
+        </div>
+
         <div class="bottom-grid">
           <div class="card chart-card">
             <h3>Spending by Category</h3>
@@ -86,7 +66,10 @@
             <div class="cat-list">
               <div v-for="(amt, cat) in summary.by_category" :key="cat" class="cat-item">
                 <span class="cat-name">{{ cat }}</span>
-                <span class="cat-amt">{{ fmt(amt) }}</span>
+                <div class="cat-right">
+                  <span class="cat-pct" v-if="summary.salary > 0">{{ Math.round((amt/summary.salary)*100) }}%</span>
+                  <span class="cat-amt">{{ fmt(amt) }}</span>
+                </div>
               </div>
               <div v-if="!Object.keys(summary.by_category || {}).length" class="empty">No expenses yet</div>
             </div>
@@ -96,12 +79,17 @@
 
       <!-- TRANSACTIONS TAB -->
       <div v-if="tab === 'transactions'" class="tab-content fade-up">
-        <!-- Add Transaction Form -->
         <div class="card add-form">
           <h3>Add Transaction</h3>
           <div class="form-grid">
             <input v-model="form.name" placeholder="Item name (e.g. Ramen)" />
-            <input v-model="form.amount" type="number" placeholder="Amount" />
+            <input
+              v-model="displayAmount"
+              type="text"
+              placeholder="Amount"
+              @input="onAmountInput"
+              inputmode="numeric"
+            />
             <select v-model="form.type">
               <option value="expense">Expense</option>
               <option value="income">Income</option>
@@ -126,7 +114,6 @@
           </button>
         </div>
 
-        <!-- Sort + List -->
         <div class="card" style="margin-top:16px">
           <div class="list-header">
             <h3>Transactions — {{ monthName }} {{ currentYear }}</h3>
@@ -179,9 +166,7 @@
               <div class="bubble">{{ msg.content }}</div>
             </div>
             <div v-if="aiLoading" class="msg assistant">
-              <div class="bubble typing">
-                <span></span><span></span><span></span>
-              </div>
+              <div class="bubble typing"><span></span><span></span><span></span></div>
             </div>
           </div>
           <div class="ai-input-row">
@@ -191,6 +176,22 @@
         </div>
       </div>
     </main>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <button :class="{ active: tab === 'dashboard' }" @click="tab = 'dashboard'">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Dashboard</span>
+      </button>
+      <button :class="{ active: tab === 'transactions' }" @click="tab = 'transactions'">
+        <span class="nav-icon">💴</span>
+        <span class="nav-label">Transactions</span>
+      </button>
+      <button :class="{ active: tab === 'ai' }" @click="tab = 'ai'">
+        <span class="nav-icon">🤖</span>
+        <span class="nav-label">AI</span>
+      </button>
+    </nav>
 
     <!-- Salary Modal -->
     <div class="modal-overlay" v-if="showSalaryModal" @click.self="showSalaryModal = false">
@@ -204,11 +205,14 @@
         <button class="btn-primary" style="margin-top:12px" @click="saveSalary">Save</button>
       </div>
     </div>
+
+    <!-- User menu overlay -->
+    <div v-if="showUserMenu" class="overlay" @click="showUserMenu = false"></div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, watch } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { Pie } from 'vue-chartjs'
@@ -220,15 +224,16 @@ ChartJS.register(ArcElement, Tooltip, Legend)
 const auth = useAuthStore()
 const router = useRouter()
 const tab = ref('dashboard')
-const sidebarOpen = ref(false)
 const currency = ref('IDR')
+const showUserMenu = ref(false)
 const currentMonth = ref(new Date().getMonth() + 1)
 const currentYear = ref(new Date().getFullYear())
 const summary = ref({ salary: 0, total_expense: 0, total_income: 0, balance: 0, by_category: {}, transaction_count: 0 })
 const transactions = ref([])
 const categories = ref([])
 const sortBy = ref('default')
-const form = ref({ name: '', amount: '', type: 'expense', category: '', currency: 'IDR', date: new Date().toISOString().split('T')[0], note: '' })
+const form = ref({ name: '', amount: 0, type: 'expense', category: '', currency: 'IDR', date: new Date().toISOString().split('T')[0], note: '' })
+const displayAmount = ref('')
 const newCat = ref('')
 const txLoading = ref(false)
 const showSalaryModal = ref(false)
@@ -240,14 +245,20 @@ const aiLoading = ref(false)
 const msgBox = ref(null)
 
 const suggestions = [
-  'How am I doing this month?',
-  'Give me savings tips',
   'Analyze my spending',
+  'Tips hemat uang bulan ini',
+  'Bagaimana kondisi keuangan saya?',
   'How to save more from my salary?'
 ]
 
 const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December']
 const monthName = computed(() => monthNames[currentMonth.value - 1])
+
+function onAmountInput(e) {
+  const raw = e.target.value.replace(/\D/g, '')
+  form.value.amount = parseFloat(raw) || 0
+  displayAmount.value = raw ? parseInt(raw).toLocaleString('id-ID') : ''
+}
 
 function fmt(n) {
   const amount = n || 0
@@ -307,8 +318,9 @@ async function addTransaction() {
   if (!form.value.name || !form.value.amount || !form.value.category) return
   txLoading.value = true
   try {
-    await api.post('/transactions', { ...form.value, amount: parseFloat(form.value.amount) })
-    form.value = { name: '', amount: '', type: 'expense', category: '', currency: 'IDR', date: new Date().toISOString().split('T')[0], note: '' }
+    await api.post('/transactions', { ...form.value })
+    form.value = { name: '', amount: 0, type: 'expense', category: '', currency: 'IDR', date: new Date().toISOString().split('T')[0], note: '' }
+    displayAmount.value = ''
     await loadData()
   } catch (e) { console.error(e) }
   txLoading.value = false
@@ -352,113 +364,114 @@ async function sendAI() {
 }
 
 function sendSuggestion(s) { aiInput.value = s; sendAI() }
-
 function handleLogout() { auth.logout(); router.push('/login') }
-
 onMounted(loadData)
 </script>
 
 <style scoped>
-.app { display: flex; min-height: 100vh; background: var(--bg); }
+.app { display: flex; flex-direction: column; min-height: 100vh; background: var(--bg); }
 
-.sidebar {
-  width: 240px; min-height: 100vh;
+.topbar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
   background: var(--bg2);
-  border-right: 1px solid var(--border);
-  display: flex; flex-direction: column;
-  padding: 24px 16px;
-  position: fixed; left: 0; top: 0; z-index: 100;
-  transition: transform 0.3s;
+  position: sticky; top: 0; z-index: 10;
 }
-.sidebar-logo { font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 8px; padding: 0 8px 24px; }
-.sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 4px; }
-.sidebar-nav button { text-align: left; padding: 12px 16px; border-radius: 10px; background: none; color: var(--muted); font-size: 14px; font-weight: 500; transition: all 0.2s; }
-.sidebar-nav button:hover, .sidebar-nav button.active { background: rgba(201,169,110,0.1); color: var(--accent); }
-.sidebar-user { border-top: 1px solid var(--border); padding-top: 16px; }
-.user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-weight: 700; color: #0a0a0f; font-size: 14px; }
-.user-name { font-size: 13px; font-weight: 600; }
-.user-email { font-size: 11px; color: var(--muted); }
-.logout { width: 100%; text-align: center; }
-
-.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
-
-.main { margin-left: 240px; flex: 1; padding: 0 0 40px; min-height: 100vh; }
-
-.topbar { display: flex; align-items: center; gap: 12px; padding: 16px 24px; border-bottom: 1px solid var(--border); background: var(--bg2); position: sticky; top: 0; z-index: 10; }
-.hamburger { display: none; background: none; color: var(--text); font-size: 20px; padding: 4px 8px; }
-.month-nav { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; flex: 1; justify-content: center; }
-.btn-ghost.sm { padding: 6px 12px; font-size: 16px; }
-.currency-switch { display: flex; gap: 4px; }
-.currency-switch button { padding: 6px 12px; border-radius: 8px; background: none; border: 1px solid var(--border); color: var(--muted); font-size: 12px; font-weight: 600; }
+.topbar-logo { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 6px; }
+.month-nav { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; flex: 1; justify-content: center; }
+.btn-ghost.sm { padding: 4px 10px; font-size: 16px; }
+.topbar-right { display: flex; align-items: center; gap: 8px; position: relative; }
+.currency-switch { display: flex; gap: 3px; }
+.currency-switch button { padding: 5px 10px; border-radius: 8px; background: none; border: 1px solid var(--border); color: var(--muted); font-size: 11px; font-weight: 600; }
 .currency-switch button.active { background: var(--accent); color: #0a0a0f; border-color: var(--accent); }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-weight: 700; color: #0a0a0f; font-size: 13px; cursor: pointer; }
+.user-menu { position: absolute; top: 40px; right: 0; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 12px; min-width: 180px; z-index: 100; }
+.um-name { font-weight: 700; font-size: 13px; }
+.um-email { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+.um-logout { width: 100%; padding: 8px; background: rgba(239,68,68,0.1); color: var(--red); border: none; border-radius: 8px; font-size: 13px; cursor: pointer; }
 
-.tab-content { padding: 24px; }
+.main { flex: 1; padding-bottom: 70px; }
 
-.summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+.tab-content { padding: 16px; }
+
+.summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
 .summary-card { position: relative; }
-.s-label { font-size: 12px; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-.s-value { font-size: 22px; font-weight: 700; }
+.s-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.s-value { font-size: 20px; font-weight: 700; }
 .green { color: var(--green); }
 .red { color: var(--red); }
-.edit-salary { position: absolute; top: 16px; right: 16px; background: none; border: 1px solid var(--border); color: var(--muted); padding: 4px 10px; font-size: 11px; border-radius: 6px; }
-.edit-salary:hover { border-color: var(--accent); color: var(--accent); }
+.edit-salary { position: absolute; top: 12px; right: 12px; background: none; border: 1px solid var(--border); color: var(--muted); padding: 3px 8px; font-size: 10px; border-radius: 6px; }
 
-.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.chart-wrap { margin-top: 12px; max-width: 240px; margin-left: auto; margin-right: auto; }
-.empty-chart { text-align: center; color: var(--muted); padding: 40px 0; font-size: 13px; }
-.cat-list { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
-.cat-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.warning-bar { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 10px 14px; font-size: 13px; color: var(--red); margin-bottom: 12px; font-weight: 600; }
+
+.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.chart-wrap { margin-top: 10px; max-width: 200px; margin-left: auto; margin-right: auto; }
+.empty-chart { text-align: center; color: var(--muted); padding: 32px 0; font-size: 13px; }
+.cat-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.cat-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
 .cat-name { color: var(--muted); }
-.cat-amt { font-weight: 600; }
+.cat-right { display: flex; align-items: center; gap: 8px; }
+.cat-pct { font-size: 11px; color: var(--accent); background: rgba(201,169,110,0.1); padding: 2px 6px; border-radius: 10px; }
+.cat-amt { font-weight: 600; font-size: 12px; }
 
-.add-form h3, .list-header h3 { margin-bottom: 16px; font-size: 15px; }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.add-form h3 { margin-bottom: 14px; font-size: 15px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .custom-cat-row { display: flex; gap: 8px; margin-top: 8px; }
 .custom-cat-row input { flex: 1; }
 .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.list-header h3 { font-size: 14px; }
 .tx-list { display: flex; flex-direction: column; gap: 8px; max-height: 400px; overflow-y: auto; }
-.tx-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg3); border-radius: 10px; }
-.tx-name { font-size: 14px; font-weight: 600; }
+.tx-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: var(--bg3); border-radius: 10px; }
+.tx-name { font-size: 13px; font-weight: 600; }
 .tx-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
-.tx-right { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 14px; }
-.del-btn { background: rgba(239,68,68,0.15); color: var(--red); border: none; width: 28px; height: 28px; border-radius: 6px; font-size: 16px; display: flex; align-items: center; justify-content: center; }
-.del-btn:hover { background: var(--red); color: white; }
-.empty { text-align: center; color: var(--muted); font-size: 13px; padding: 24px 0; }
+.tx-right { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; }
+.del-btn { background: rgba(239,68,68,0.15); color: var(--red); border: none; width: 26px; height: 26px; border-radius: 6px; font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-.ai-card { display: flex; flex-direction: column; height: calc(100vh - 140px); }
-.ai-header { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.ai-card { display: flex; flex-direction: column; height: calc(100vh - 150px); }
+.ai-header { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
 .ai-title { display: flex; align-items: center; gap: 12px; }
-.ai-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 4px; }
-.ai-welcome { text-align: center; padding: 32px 16px; color: var(--muted); line-height: 1.8; }
-.suggestions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; }
-.suggest-btn { padding: 8px 14px; border-radius: 20px; background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-size: 12px; }
+.ai-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 2px; }
+.ai-welcome { text-align: center; padding: 24px 12px; color: var(--muted); line-height: 1.8; font-size: 14px; }
+.suggestions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 12px; }
+.suggest-btn { padding: 7px 12px; border-radius: 20px; background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-size: 12px; cursor: pointer; }
 .suggest-btn:hover { border-color: var(--accent); color: var(--accent); }
 .msg { display: flex; }
 .msg.user { justify-content: flex-end; }
 .msg.assistant { justify-content: flex-start; }
-.bubble { max-width: 80%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; }
+.bubble { max-width: 85%; padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
 .msg.user .bubble { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #0a0a0f; border-bottom-right-radius: 4px; }
 .msg.assistant .bubble { background: var(--bg3); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
-.typing { display: flex; gap: 4px; align-items: center; padding: 16px; }
+.typing { display: flex; gap: 4px; align-items: center; padding: 14px; }
 .typing span { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: bounce 1s infinite; }
 .typing span:nth-child(2) { animation-delay: 0.15s; }
 .typing span:nth-child(3) { animation-delay: 0.3s; }
 @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
-.ai-input-row { display: flex; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
-.send-btn { width: 48px; padding: 0; flex-shrink: 0; font-size: 18px; }
+.ai-input-row { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.send-btn { width: 44px; padding: 0; flex-shrink: 0; font-size: 16px; }
+
+/* Bottom Nav */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  display: flex;
+  z-index: 50;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.bottom-nav button {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  padding: 10px 0; background: none; color: var(--muted);
+  border-radius: 0; gap: 3px; transition: all 0.2s;
+}
+.bottom-nav button.active { color: var(--accent); }
+.bottom-nav button.active .nav-icon { transform: translateY(-2px); }
+.nav-icon { font-size: 20px; transition: transform 0.2s; }
+.nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.3px; }
+
+.overlay { position: fixed; inset: 0; z-index: 90; }
 
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 24px; }
 .modal { width: 100%; max-width: 360px; }
 .modal h3 { font-size: 16px; }
-
-@media (max-width: 768px) {
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); }
-  .main { margin-left: 0; }
-  .hamburger { display: block; }
-  .summary-grid { grid-template-columns: 1fr 1fr; }
-  .bottom-grid { grid-template-columns: 1fr; }
-  .form-grid { grid-template-columns: 1fr; }
-}
 </style>
