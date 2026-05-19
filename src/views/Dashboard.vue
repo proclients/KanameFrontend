@@ -293,7 +293,7 @@ const chartData = computed(() => {
     datasets: [{ data: cats.map(c => summary.value.by_category[c]), backgroundColor: COLORS.slice(0, cats.length), borderWidth: 0 }]
   }
 })
-const chartOptions = { responsive: true, cutout: '0%', plugins: { legend: { position: 'bottom', labels: { color: '#f0ece4', font: { family: 'Outfit', size: 11 }, padding: 12, boxWidth: 12 } }, tooltip: { callbacks: { label: (ctx) => { const total = ctx.dataset.data.reduce((a,b) => a+b, 0); const pct = Math.round((ctx.parsed/total)*100); return ' ' + ctx.label + ': ' + pct + '%'; } } } } }
+const chartOptions = { responsive: true, cutout: '0%', plugins: { legend: { position: 'bottom', labels: { color: '#f0ece4', font: { family: 'Outfit', size: 11 }, padding: 6, boxWidth: 10 } }, tooltip: { callbacks: { label: (ctx) => { const total = ctx.dataset.data.reduce((a,b) => a+b, 0); const pct = Math.round((ctx.parsed/total)*100); return ' ' + ctx.label + ': ' + pct + '%'; } } } } }
 
 function prevMonth() {
   if (currentMonth.value === 1) { currentMonth.value = 12; currentYear.value-- }
@@ -412,8 +412,8 @@ onMounted(loadData)
 
 .warning-bar { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 10px 14px; font-size: 13px; color: var(--red); margin-bottom: 12px; font-weight: 600; }
 
-.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: stretch; flex: 1; }
-.chart-wrap { margin-top: 10px; max-width: 240px; margin-left: auto; margin-right: auto; margin-bottom: 12px; }
+.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: stretch; min-height: calc(100vh - 320px); }
+.chart-wrap { margin-top: 10px; max-width: 100%; margin-left: auto; margin-right: auto; margin-bottom: 8px; }
 .empty-chart { text-align: center; color: var(--muted); padding: 32px 0; font-size: 13px; }
 .cat-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
 .cat-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
