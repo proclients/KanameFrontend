@@ -197,7 +197,7 @@
     <div class="modal-overlay" v-if="showSalaryModal" @click.self="showSalaryModal = false">
       <div class="modal card fade-up">
         <h3>Set Monthly Salary</h3>
-        <input v-model="salaryInput" type="number" placeholder="e.g. 5000000" style="margin-top:12px" />
+              <input :value="displaySalary" type="text" placeholder="e.g. 5.000.000" @input="onSalaryInput" inputmode="numeric" style="margin-top:12px" />
         <select v-model="salaryCurrency" style="margin-top:8px">
           <option value="IDR">IDR (Rupiah)</option>
           <option value="JPY">JPY (Yen)</option>
@@ -238,6 +238,7 @@ const newCat = ref('')
 const txLoading = ref(false)
 const showSalaryModal = ref(false)
 const salaryInput = ref('')
+const displaySalary = ref('')
 const salaryCurrency = ref('IDR')
 const aiInput = ref('')
 const messages = ref([])
@@ -253,6 +254,12 @@ const suggestions = [
 
 const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December']
 const monthName = computed(() => monthNames[currentMonth.value - 1])
+
+function onSalaryInput(e) {
+  const raw = e.target.value.replace(/\D/g, '')
+  salaryInput.value = raw
+  displaySalary.value = raw ? parseInt(raw).toLocaleString('id-ID') : ''
+}
 
 function onAmountInput(e) {
   const raw = e.target.value.replace(/\D/g, '')
@@ -311,6 +318,7 @@ async function loadData() {
     transactions.value = txRes.data
     categories.value = catRes.data
     salaryInput.value = sumRes.data.salary || ''
+    displaySalary.value = sumRes.data.salary ? parseInt(sumRes.data.salary).toLocaleString('id-ID') : ''
   } catch (e) { console.error(e) }
 }
 
@@ -405,8 +413,8 @@ onMounted(loadData)
 
 .warning-bar { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 10px 14px; font-size: 13px; color: var(--red); margin-bottom: 12px; font-weight: 600; }
 
-.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: start; margin-bottom: 16px; }
-.chart-wrap { margin-top: 10px; max-width: 180px; margin-left: auto; margin-right: auto; }
+.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: stretch; margin-bottom: 16px; }
+.chart-wrap { margin-top: 10px; max-width: 200px; margin-left: auto; margin-right: auto; }
 .empty-chart { text-align: center; color: var(--muted); padding: 32px 0; font-size: 13px; }
 .cat-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
 .cat-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
