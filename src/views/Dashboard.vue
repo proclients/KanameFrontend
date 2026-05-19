@@ -21,7 +21,7 @@
           <div class="user-menu" v-if="showUserMenu">
             <div class="um-name">{{ auth.user?.name }}</div>
             <div class="um-email">{{ auth.user?.email }}</div>
-            <button class="um-logout" @click="handleLogout">Logout</button>
+            <button class="um-logout" @click.stop="handleLogout">Logout</button>
           </div>
         </div>
       </div>
