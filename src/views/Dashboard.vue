@@ -17,11 +17,11 @@
             <button :class="{ active: currency === 'IDR' }" @click="currency = 'IDR'">IDR</button>
             <button :class="{ active: currency === 'JPY' }" @click="currency = 'JPY'">JPY</button>
           </div>
-          <div class="avatar" @click="showUserMenu = !showUserMenu">{{ auth.user?.name?.[0] }}</div>
+          <div class="avatar" @click.stop="showUserMenu = !showUserMenu">{{ auth.user?.name?.[0] }}</div>
           <div class="user-menu" v-if="showUserMenu">
             <div class="um-name">{{ auth.user?.name }}</div>
             <div class="um-email">{{ auth.user?.email }}</div>
-            <button class="um-logout" @click.stop="handleLogout">Logout</button>
+            <button class="um-logout" @click="handleLogout">Logout</button>
           </div>
         </div>
       </div>
@@ -206,8 +206,7 @@
       </div>
     </div>
 
-    <!-- User menu overlay -->
-    <div v-if="showUserMenu" class="overlay" @click="showUserMenu = false"></div>
+    
   </div>
 </template>
 
@@ -394,7 +393,7 @@ onMounted(loadData)
 .currency-switch button { padding: 5px 10px; border-radius: 8px; background: none; border: 1px solid var(--border); color: var(--muted); font-size: 11px; font-weight: 600; }
 .currency-switch button.active { background: var(--accent); color: #0a0a0f; border-color: var(--accent); }
 .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-weight: 700; color: #0a0a0f; font-size: 13px; cursor: pointer; }
-.user-menu { position: absolute; top: 40px; right: 0; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 12px; min-width: 180px; z-index: 100; }
+.user-menu { position: absolute; top: 40px; right: 0; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 12px; min-width: 180px; z-index: 999; }
 .um-name { font-weight: 700; font-size: 13px; }
 .um-email { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
 .um-logout { width: 100%; padding: 8px; background: rgba(239,68,68,0.1); color: var(--red); border: none; border-radius: 8px; font-size: 13px; cursor: pointer; }
