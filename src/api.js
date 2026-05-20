@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://client0-kanamebackend.hf.space',
+  baseURL: import.meta.env.VITE_API_URL || 'https://client0-kaname.hf.space',
 })
 
 api.interceptors.request.use((config) => {
