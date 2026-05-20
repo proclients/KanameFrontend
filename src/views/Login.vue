@@ -16,6 +16,7 @@
           {{ loading ? 'Signing in...' : 'Sign In' }}
         </button>
         <p class="switch">Don't have an account? <router-link to="/register">Register</router-link></p>
+        <p class="switch"><router-link to="/forgot-password">Lupa password?</router-link></p>
         <p v-if="error" class="err">{{ error }}</p>
       </div>
     </div>
