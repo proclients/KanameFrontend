@@ -106,7 +106,7 @@ onUnmounted(() => clearTimeout(timer))
 .close-btn:hover { transform: rotate(90deg); }
 
 .profile-section { display: flex; gap: 16px; align-items: center; margin-bottom: 16px; }
-.avatar-img { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; object-position: center 0%; border: 2px solid var(--accent); box-shadow: 0 0 16px rgba(201,169,110,0.3); flex-shrink: 0; }
+.avatar-img { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; object-position: center 30%; border: 2px solid var(--accent); box-shadow: 0 0 16px rgba(201,169,110,0.3); flex-shrink: 0; }
 
 .profile-info h2 { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
 .role { font-size: 11px; color: var(--muted); line-height: 1.5; margin-bottom: 8px; }
