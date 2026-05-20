@@ -19,6 +19,7 @@
           <div class="user-menu" v-if="showUserMenu">
             <div class="um-name">{{ auth.user?.name }}</div>
             <div class="um-email">{{ auth.user?.email }}</div>
+            <button class="um-about" @click="showAbout = true; showUserMenu = false">About Developer</button>
             <button class="um-logout" @click="handleLogout">Logout</button>
           </div>
         </div>
@@ -181,6 +182,8 @@
       </button>
     </nav>
 
+    <AboutModal v-if="showAbout" @close="showAbout = false" />
+
     <div class="modal-overlay" v-if="showSalaryModal" @click.self="showSalaryModal = false">
       <div class="modal card fade-up">
         <h3>Set Monthly Salary</h3>
@@ -201,6 +204,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { Pie } from 'vue-chartjs'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
+import AboutModal from "../components/AboutModal.vue"
 import api from '../api'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
@@ -210,6 +214,7 @@ const router = useRouter()
 const tab = ref('dashboard')
 const currency = ref('IDR')
 const showUserMenu = ref(false)
+const showAbout = ref(false)
 const currentMonth = ref(new Date().getMonth() + 1)
 const currentYear = ref(new Date().getFullYear())
 const summary = ref({ salary: 0, total_expense: 0, total_income: 0, balance: 0, by_category: {}, transaction_count: 0 })
@@ -397,6 +402,7 @@ onMounted(loadData)
 .user-menu { position: absolute; top: 40px; right: 0; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 12px; min-width: 180px; z-index: 999; }
 .um-name { font-weight: 700; font-size: 13px; }
 .um-email { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+.um-about { width: 100%; padding: 8px; background: var(--bg3); color: var(--accent); border: none; border-radius: 8px; font-size: 13px; cursor: pointer; margin-bottom: 6px; }
 .um-logout { width: 100%; padding: 8px; background: rgba(239,68,68,0.1); color: var(--red); border: none; border-radius: 8px; font-size: 13px; cursor: pointer; }
 
 .main { flex: 1; padding-bottom: 70px; }
