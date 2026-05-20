@@ -21,8 +21,9 @@
         <h3>🤖 Bots & AI</h3>
         <div class="item-list">
           <div class="item">KontenAI — Telegram bot content creation (Groq + Pollinations.ai + Gemini)</div>
+          <a href="https://salman0812.github.io/FraudDetection-ByMe/" target="_blank" class="item link">Fraud Detection — ML project deteksi transaksi mencurigakan</a>
           <div class="item">SalmanHelper — Google Gemini Gem dengan 5 modul akademik</div>
-          <div class="item">Fraud Detection — ML project deteksi transaksi mencurigakan</div>
+          
         </div>
       </div>
 
@@ -30,10 +31,10 @@
         <h3>🌐 Web Apps</h3>
         <div class="item-list">
           <a href="https://mesintugas.vercel.app" target="_blank" class="item link">Mesin Tugas UT — AI academic assistant (Next.js + FastAPI + Groq)</a>
-          <a href="https://chuangku.ricossh.cloud" target="_blank" class="item link">Chuàng Kù (创库) — Digital marketplace + Telegram bot</a>
+          <a href="https://chuangku.vercel.app/" target="_blank" class="item link">Chuàng Kù (创库) — Digital marketplace + Telegram bot</a>
           <a href="https://businessanalytic.vercel.app" target="_blank" class="item link">Business Analytic AI — Dashboard analitik berbasis AI</a>
-          <a href="https://cliniqu.vercel.app" target="_blank" class="item link">ClinIQ — Medical analytics app</a>
-          <a href="https://ricosh.cloud" target="_blank" class="item link">Expense & Budget Visualizer — Budget tracker</a>
+          <a href="https://cliniqu.vercel.app/" target="_blank" class="item link">ClinIQ — Medical analytics app</a>
+          <a href="https://salman0812.github.io/CodingCamp-30Mar26-salman/" target="_blank" class="item link">Expense & Budget Visualizer — Budget tracker</a>
         </div>
       </div>
 
