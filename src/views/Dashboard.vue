@@ -374,7 +374,8 @@ async function sendAI() {
   await nextTick()
   if (msgBox.value) msgBox.value.scrollTop = msgBox.value.scrollHeight
   try {
-    const res = await api.post('/ai/chat', { message: msg, context: summary.value })
+    const history = messages.value.slice(0, -1).slice(-10)
+    const res = await api.post('/ai/chat', { message: msg, context: summary.value, history })
     messages.value.push({ role: 'assistant', content: res.data.reply })
   } catch (e) { messages.value.push({ role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }) }
   aiLoading.value = false
